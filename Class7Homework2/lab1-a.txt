@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# -----------------------------
+# Random File Management Generator
+# -----------------------------
+
+echo "=== Random File Management Generator ==="
+
+# Ask user for input
+read -p "How many main directories would you like to create? " dir_count
+read -p "How many files should be created inside each directory? " file_count
+
+# Root directory
+ROOT_DIR="random_file_system"
+
+# Create root directory
+mkdir -p "$ROOT_DIR"
+
+# Category arrays
+supermodels=("NaomiCampbell" "GiseleBundchen" "AdrianaLima" "TyraBanks" "BellaHadid")
+countries=("USA" "Brazil" "Japan" "Germany" "Kenya")
+cars=("Tesla" "BMW" "Toyota" "Ferrari" "Ford")
+films=("Inception" "Matrix" "Avatar" "Gladiator" "Interstellar")
+
+# Extra nested categories
+years=("2022" "2023" "2024" "2025" "2026")
+months=("January" "February" "March" "April" "May" "June")
+
+# File extensions
+extensions=(".txt" ".log" ".data" ".cfg")
+
+# Function: get random item from array
+get_random() {
+    local array=("$@")
+    echo "${array[$RANDOM % ${#array[@]}]}"
+}
+
+# Validate numeric input
+if ! [[ "$dir_count" =~ ^[0-9]+$ ]] || ! [[ "$file_count" =~ ^[0-9]+$ ]]; then
+    echo "Error: please enter whole numbers only."
+    exit 1
+fi
+
+# Main generation loop
+for ((i=1; i<=dir_count; i++))
+do
+    # Random selections
+    model=$(get_random "${supermodels[@]}")
+    country=$(get_random "${countries[@]}")
+    car=$(get_random "${cars[@]}")
+    film=$(get_random "${films[@]}")
+    year=$(get_random "${years[@]}")
+    month=$(get_random "${months[@]}")
+
+    # Create nested directory structure
+    dir_name="${model}_${country}_${car}"
+    nested_path="$ROOT_DIR/$year/$month/$dir_name"
+
+    mkdir -p "$nested_path"
+
+    # Create files in each nested directory
+    for ((j=1; j<=file_count; j++))
+    do
+        ext=$(get_random "${extensions[@]}")
+        timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+        random_num=$RANDOM
+        file_name="${film}_${random_num}_${timestamp}${ext}"
+        full_file_path="$nested_path/$file_name"
+
+        # Generate content inside each file
+        echo "File Report" > "$full_file_path"
+        echo "-----------" >> "$full_file_path"
+        echo "Supermodel: $model" >> "$full_file_path"
+        echo "Country: $country" >> "$full_file_path"
+        echo "Car: $car" >> "$full_file_path"
+        echo "Film: $film" >> "$full_file_path"
+        echo "Year Folder: $year" >> "$full_file_path"
+        echo "Month Folder: $month" >> "$full_file_path"
+        echo "Generated on: $(date)" >> "$full_file_path"
+        echo "Random ID: $random_num" >> "$full_file_path"
+
+        # Set file timestamp
+        touch -t $(date +"%Y%m%d%H%M.%S") "$full_file_path"
+    done
+done
+
+echo
+echo "Generation complete."
+echo "Root directory created: $ROOT_DIR"
